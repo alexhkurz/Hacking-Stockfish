@@ -4,5 +4,5 @@ This is a learning project. Starting from Stockfish, the aim is to make easy mod
 
 We keep different versions in different branches.
 
-- `evaluate-to-zero` evaluates all moves to zero. 
+- `evaluation-is-zero` evaluates all moves to zero. 
 - ...
