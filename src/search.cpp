@@ -1853,86 +1853,53 @@ void update_quiet_histories(const Position& pos,
 
 // When playing with strength handicap, choose the best move among a set of
 // RootMoves using a statistical rule dependent on 'level'. Idea by Heinz van Saanen.
-// Move Skill::pick_best(const RootMoves& rootMoves, size_t multiPV) {
-//     static PRNG rng(now());  // PRNG sequence should be non-deterministic
-
-//     // RootMoves are already sorted by score in descending order
-//     Value  topScore = rootMoves[0].score;
-//     int    delta    = std::min(topScore - rootMoves[multiPV - 1].score, int(PawnValue));
-//     int    maxScore = -VALUE_INFINITE;
-//     double weakness = 120 - 2 * level;
-
-//     // Choose best move. For each move score we add two terms, both dependent on
-//     // weakness. One is deterministic and bigger for weaker levels, and one is
-//     // random. Then we choose the move with the resulting highest score.
-//     for (size_t i = 0; i < multiPV; ++i)
-//     {
-//         // This is our magic formula
-//         int push = (weakness * int(topScore - rootMoves[i].score)
-//                     + delta * (rng.rand<unsigned>() % int(weakness)))
-//                  / 128;
-
-//         if (rootMoves[i].score + push >= maxScore)
-//         {
-//             maxScore = rootMoves[i].score + push;
-//             best     = rootMoves[i].pv[0];
-//         }
-//     }
-
-//     return best;
-// }
-
-//pick from top 5 best moves randomly  
-// Move Skill::pick_best(const RootMoves& rootMoves, size_t multiPV) {
-//     static PRNG rng(now());  // PRNG sequence should be non-deterministic
-
-//     if (rootMoves.empty())
-//         return Move::none();
-//     size_t movesToConsider = std::min({multiPV, rootMoves.size(), size_t(5)});
-//     std::cout << "\nTop " << movesToConsider << " moves:\n";
-//     for (size_t i = 0; i < movesToConsider; ++i) {
-//         std::cout << i + 1 << ". " << UCIEngine::move(rootMoves[i].pv[0], false) 
-//                   << " (score: " << rootMoves[i].score << ")\n";
-//     }
-//     size_t randomIndex = rng.rand<unsigned>() % movesToConsider;
-//     std::cout << "\nChosen move: " << UCIEngine::move(rootMoves[randomIndex].pv[0], false) 
-//               << " (index: " << randomIndex + 1 << ")\n\n";
-//     return rootMoves[randomIndex].pv[0];
-// }
-
 Move Skill::pick_best(const RootMoves& rootMoves, size_t multiPV) {
     static PRNG rng(now());  // PRNG sequence should be non-deterministic
 
     if (rootMoves.empty())
         return Move::none();
 
-    size_t movesToConsider = std::min({multiPV, rootMoves.size(), size_t(5)}); //up to 5
+    // Get the score of the top move
+    int topScore = rootMoves[0].score;
+    int scoreThreshold = 50; // Define the score range
 
-    std::cout << "info string Top " << movesToConsider << " moves with their PVs:\n";
+    // Filter moves within the score range
+    std::vector<RootMove> filteredMoves;
+    for (const auto& move : rootMoves) {
+        if (move.score >= topScore - scoreThreshold) {
+            filteredMoves.push_back(move);
+        }
+    }
+
+    // Determine how many moves to consider from the filtered list
+    size_t movesToConsider = std::min({multiPV, filteredMoves.size(), size_t(5)}); // up to 5
+
+    std::cout << "info string Top " << movesToConsider << " moves within 50 points of the top score:\n";
     for (size_t i = 0; i < movesToConsider; ++i) {
         std::cout << "info string " << i + 1 << ". " 
-                  << UCIEngine::move(rootMoves[i].pv[0], false) 
-                  << " (score: " << rootMoves[i].score << ")\n";
+                  << UCIEngine::move(filteredMoves[i].pv[0], false) 
+                  << " (score: " << filteredMoves[i].score << ")\n";
         
         std::cout << "info string    PV:";
-        for (const Move& m : rootMoves[i].pv) {
+        for (const Move& m : filteredMoves[i].pv) {
             std::cout << " " << UCIEngine::move(m, false);
         }
         std::cout << "\n";
     }
 
+    // Randomly select from the filtered moves
     size_t randomIndex = rng.rand<unsigned>() % movesToConsider;
 
-    std::cout << "info string Chosen move: " << UCIEngine::move(rootMoves[randomIndex].pv[0], false) 
+    std::cout << "info string Chosen move: " << UCIEngine::move(filteredMoves[randomIndex].pv[0], false) 
               << " (index: " << randomIndex + 1 << ")\n";
     
     std::cout << "info string Chosen PV:";
-    for (const Move& m : rootMoves[randomIndex].pv) {
+    for (const Move& m : filteredMoves[randomIndex].pv) {
         std::cout << " " << UCIEngine::move(m, false);
     }
     std::cout << "\n";
 
-    return rootMoves[randomIndex].pv[0];
+    return filteredMoves[randomIndex].pv[0];
 }
 
 
