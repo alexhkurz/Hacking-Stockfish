@@ -16,11 +16,3 @@ tsan.supp
 __pycache__/
 tests/syzygy
 tests/bench_tmp.epd
-
-
-
-Stockfish/
-evaluationZero/
-pickBestMoves/
-printScores/
-worstMove/
