@@ -17,34 +17,32 @@ class ChessAnalyzer:
         if current_index < 2:  
             return
 
-        move_number = (current_index // 2)+ 1  
-        print("FORCED MOVE: ", move_number, current_index+1, board.san(move))
+        move_number = (current_index // 2) + 1  
+        print(f"FORCED MOVE: {move_number} {current_index + 1} {board.san(move)}")
 
-        current_color = "White" if (current_index) % 2 == 0 else "Black"
+        current_color = "White" if current_index % 2 == 0 else "Black"
         current_analysis = analysis[current_index]
-        
         current_good_options = sum(1 for score, _ in current_analysis['top_sequences'] if abs(score - current_analysis['top_sequences'][0][0]) <= 100)
-        
         is_forcing_move = len(current_analysis['forcing_moves'][0]) > 0
         
         if is_forcing_move:
-            for i in range(current_index - 2, -1, -2):  # Look at moves of the same color
-                print(f"   -ITERATING BACKWARDS TO FIND A CRITICAL MOMENT {((i+1)//2 + 1)} {i+1} {board.san(move)}")
+            for i in range(current_index - 2, -1, -2):  # Count backwards by 2
                 earlier_analysis = analysis[i]
                 earlier_good_options = sum(1 for score, _ in earlier_analysis['top_sequences'] if abs(score - earlier_analysis['top_sequences'][0][0]) <= 100)
-                earlier_good_move, *_ = earlier_analysis['move']
+                earlier_good_move = earlier_analysis['move'][0]
+                earlier_move_number = (i // 2) + 1
+                print(f"   -ITERATING BACKWARDS TO FIND A CRITICAL MOMENT {earlier_move_number} {i + 1} {earlier_good_move}")
+                
                 if earlier_good_options > current_good_options:
-
-                    print(f"   -FOUND CRITICAL MOMENT: {move_number} {i} {earlier_good_move}")
+                    print(f"   -FOUND CRITICAL MOMENT: {earlier_move_number} {i + 1} {earlier_good_move}")
                     self.critical_moments.append({
                         'type': 'critical_move',
                         'move_number': move_number,
                         'color': current_color,
                         'move': current_analysis['move'][0],
-                        'description': f"{current_analysis['move'][0]} is a forced move that came from {earlier_good_move}, reducing options from {earlier_good_options} to {current_good_options}"
+                        'description': f"{current_analysis['move'][0]} is a forced move that came from {earlier_good_move} (move {earlier_move_number}), reducing options from {earlier_good_options} to {current_good_options}"
                     })
                     break
-
         
 
         
@@ -66,8 +64,7 @@ class ChessAnalyzer:
             if len(info) > 0:
                 top_sequence = info[0]["pv"]
                 top_score = info[0]["score"].relative.score(mate_score=10000)
-                top_score2nd = info[1]["score"].relative.score(mate_score=10000)
-                
+                top_score2nd = info[1]["score"].relative.score(mate_score=10000)                
 
                 if abs(top_score - top_score2nd) > 50:
                     self.findCriticalMoment(analysis, len(analysis)-1, move, board)
