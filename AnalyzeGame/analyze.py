@@ -134,6 +134,7 @@ class ChessAnalyzer:
             )
             analysis.append(deserialized_entry)
         return analysis
+    def close(self):
         self.engine.quit()
 
 
