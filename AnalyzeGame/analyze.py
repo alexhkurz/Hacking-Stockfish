@@ -54,10 +54,14 @@ class ChessAnalyzer:
     
     def analyzeGame(self, pgn_string, time_per_move=1.0, cache_file='analysis_cache.json'):
         if os.path.exists(cache_file):
-            with open(cache_file, 'r') as file:
-                serialized_analysis, self.critical_moments = json.load(file)
-                self.analysis = self.deserialize_analysis(serialized_analysis)
-            return self.analysis, self.critical_moments
+            try:
+                with open(cache_file, 'r') as file:
+                    serialized_analysis, self.critical_moments = json.load(file)
+                    self.analysis = self.deserialize_analysis(serialized_analysis)
+                return self.analysis, self.critical_moments
+            except json.JSONDecodeError:
+                print(f"Warning: Cache file {cache_file} is corrupted. Recomputing analysis.")
+                os.remove(cache_file)
         game = chess.pgn.read_game(io.StringIO(pgn_string))
         analysis = []
         
