@@ -10,3 +10,6 @@ Create a file `AnalyzeGame/config.json` containing the path to the Stockfish exe
 
 Then run `python analyze.py` in the `AnalyzeGame` directory.
 
+## Features Added to `gui.py`
+
+- move in the game using cursor keys

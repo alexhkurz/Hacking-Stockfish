@@ -7,9 +7,6 @@ from PyQt5.QtCore import Qt, QSize, QEvent
 from analyze import ChessAnalyzer 
 import io
 
-
-
-
 class ChessAnalyzerGUI(QMainWindow):
     def __init__(self, analyzer):
         super().__init__()
@@ -17,6 +14,13 @@ class ChessAnalyzerGUI(QMainWindow):
         self.current_position = 0
         self.analysis = None
         self.critical_moments = None
+
+        # Install event filter on the main window
+        self.installEventFilter(self)
+        # Make sure the window can accept keyboard focus
+        self.setFocusPolicy(Qt.StrongFocus)
+        # Optional: Set focus when window opens
+        self.setFocus()
         
         self.initUI()
         
@@ -74,7 +78,6 @@ class ChessAnalyzerGUI(QMainWindow):
         input_layout.addWidget(analyze_button)
         
         layout.addLayout(input_layout)
-        self.installEventFilter(self)
         
     def analyze_pgn(self, pgn_string):
         self.analysis, self.critical_moments = self.analyzer.analyzeGame(pgn_string)
@@ -130,13 +133,16 @@ class ChessAnalyzerGUI(QMainWindow):
         if self.analysis and self.current_position > 0:
             self.current_position -= 1
             self.update_display()
-
+    
     def eventFilter(self, obj, event):
         if event.type() == QEvent.KeyPress:
+            print(f"Key pressed: {event.key()}")  # Debug print
             if event.key() == Qt.Key_Right:
+                print("Right arrow pressed")  # Debug print
                 self.next_move()
                 return True
             elif event.key() == Qt.Key_Left:
+                print("Left arrow pressed")  # Debug print
                 self.prev_move()
                 return True
         return super().eventFilter(obj, event)
