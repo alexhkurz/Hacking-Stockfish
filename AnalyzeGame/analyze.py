@@ -75,41 +75,45 @@ class ChessAnalyzer:
             if move is not None:
                 info = self.engine.analyse(board, chess.engine.Limit(time=time_per_move), multipv=5)
 
-            if move is not None:
                 print(board.san(move), move_count)
+
+                # See if this move is forced (50 points better than the next best move)
+                forcing_moves = []
+                if len(info) > 0:
+                    top_sequence = info[0]["pv"]
+                    top_score = info[0]["score"].relative.score(mate_score=10000)
+                    top_score2nd = info[1]["score"].relative.score(mate_score=10000)
+
+                    if abs(top_score - top_score2nd) > 50:
+                        self.findCriticalMoment(analysis, len(analysis) - 1, move, board)
+                        forcing_moves.append(top_sequence[0])
+
+                # Add sequences to analysis for gui
+                top_sequences = []
+                for i in range(min(5, len(info))):
+                    sequence = info[i]["pv"]
+                    score = info[i]["score"].relative.score(mate_score=10000)
+                    top_sequences.append((score, sequence))
+
+                # Append the analysis for the current move
+                analysis.append({
+                    'move': (board.san(move), move_count),
+                    'fen': board.fen(),
+                    'top_sequences': top_sequences,
+                    'forcing_moves': (forcing_moves, move_count)
+                })
+
+                # Move the board to the next move state
+                board.push(move)
             else:
                 print("Game over", move_count)
-
-            #See if this move is forced (50 points better than the next best move)
-            forcing_moves = []
-            if len(info) > 0:
-                top_sequence = info[0]["pv"]
-                top_score = info[0]["score"].relative.score(mate_score=10000)
-                top_score2nd = info[1]["score"].relative.score(mate_score=10000)                
-
-                if abs(top_score - top_score2nd) > 50:
-                    self.findCriticalMoment(analysis, len(analysis)-1, move, board)
-                    forcing_moves.append(top_sequence[0])
-
-            #Add sequences to analysis for gui
-            top_sequences = []
-            for i in range(min(5, len(info))):
-                sequence = info[i]["pv"]
-                score = info[i]["score"].relative.score(mate_score=10000)
-                top_sequences.append((score, sequence))
-
-            #Append the analysis for the current move
-            analysis.append({
-                'move': (board.san(move), move_count),
-                'fen': board.fen(),
-                'top_sequences': top_sequences,
-                'forcing_moves': (forcing_moves, move_count)
-            })
-
-
-            #Move the board to the next move state 
-            if move is not None:
-                board.push(move)
+                # Append the analysis for the game over state
+                analysis.append({
+                    'move': ("Game over", move_count),
+                    'fen': board.fen(),
+                    'top_sequences': [],
+                    'forcing_moves': ([], move_count)
+                })
             move_count += 1
         
         with open(cache_file, 'w') as file:
