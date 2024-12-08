@@ -106,9 +106,7 @@ class ChessAnalyzerGUI(QMainWindow):
             except json.JSONDecodeError:
                 print(f"Warning: Cache file {cache_file} is corrupted. Recomputing analysis.")
                 os.remove(cache_file)
-                self.analysis, self.critical_moments = self.analyzer.analyzeGame(pgn_string)
         else:
-            self.analysis, self.critical_moments = self.analyzer.analyzeGame(pgn_string)
         
         self.current_position = 0
         self.update_display()
