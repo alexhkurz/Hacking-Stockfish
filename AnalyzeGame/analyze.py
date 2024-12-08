@@ -12,7 +12,8 @@ import json
 
 class ChessAnalyzer:
     def __init__(self):
-        with open('config.json', 'r') as config_file:
+        config_path = os.path.join(os.path.dirname(__file__), 'config.json')
+        with open(config_path, 'r') as config_file:
             config = json.load(config_file)
         self.engine = chess.engine.SimpleEngine.popen_uci(config['engine_path'])
         self.critical_moments = []
