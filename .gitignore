@@ -16,3 +16,11 @@ tsan.supp
 __pycache__/
 tests/syzygy
 tests/bench_tmp.epd
+
+# Added by alexhkurz
+.aider*
+.env
+load-env.py
+venv
+.DS_Store
+config.json
