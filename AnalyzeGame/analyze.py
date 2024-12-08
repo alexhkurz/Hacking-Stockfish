@@ -72,7 +72,10 @@ class ChessAnalyzer:
             if move is not None:
                 info = self.engine.analyse(board, chess.engine.Limit(time=time_per_move), multipv=5)
 
-            print(board.san(move), move_count)
+            if move is not None:
+                print(board.san(move), move_count)
+            else:
+                print("Game over", move_count)
 
             #See if this move is forced (50 points better than the next best move)
             forcing_moves = []
