@@ -1,3 +1,4 @@
+import os
 import chess
 import chess.engine
 import chess.pgn
@@ -50,7 +51,11 @@ class ChessAnalyzer:
 
         
     
-    def analyzeGame(self, pgn_string, time_per_move=1.0):
+    def analyzeGame(self, pgn_string, time_per_move=1.0, cache_file='analysis_cache.json'):
+        if os.path.exists(cache_file):
+            with open(cache_file, 'r') as file:
+                self.analysis, self.critical_moments = json.load(file)
+            return self.analysis, self.critical_moments
         game = chess.pgn.read_game(io.StringIO(pgn_string))
         analysis = []
         
@@ -93,6 +98,9 @@ class ChessAnalyzer:
             board.push(move)
             move_count += 1
         
+        with open(cache_file, 'w') as file:
+            json.dump((analysis, self.critical_moments), file)
+
         return analysis, self.critical_moments
     
     def close(self):
