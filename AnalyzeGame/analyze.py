@@ -3,6 +3,7 @@ import chess.engine
 import chess.pgn
 import io
 import sys
+import json
 
 #FIX ISSUE: IT SHOWS ITSELF AS A FORCING MOVE THAT IT LED TO
 #   - because it's not counting correctly, it's one ahead behind (it thinks 15 is 14)
@@ -10,7 +11,9 @@ import sys
 
 class ChessAnalyzer:
     def __init__(self, engine_path="/Users/akurz/alexhkurz-at-git/chess/Stockfish/src/stockfish"):
-        self.engine = chess.engine.SimpleEngine.popen_uci(engine_path)
+        with open('config.json', 'r') as config_file:
+            config = json.load(config_file)
+        self.engine = chess.engine.SimpleEngine.popen_uci(config['engine_path'])
         self.critical_moments = []
 
     def findCriticalMoment(self, analysis, current_index, move, board):
