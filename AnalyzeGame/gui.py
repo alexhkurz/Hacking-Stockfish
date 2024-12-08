@@ -25,6 +25,7 @@ class ChessAnalyzerGUI(QMainWindow):
         self.setFocus()
         
         self.initUI()
+        self.load_cached_analysis()
         
     def initUI(self):
         self.setWindowTitle('Chess Game Analyzer')
@@ -81,7 +82,20 @@ class ChessAnalyzerGUI(QMainWindow):
         
         layout.addLayout(input_layout)
         
-    def analyze_pgn(self, pgn_string):
+    def load_cached_analysis(self):
+        cache_file = 'analysis_cache.json'
+        if os.path.exists(cache_file):
+            try:
+                with open(cache_file, 'r') as file:
+                    serialized_analysis, self.critical_moments = json.load(file)
+                    self.analysis = self.analyzer.deserialize_analysis(serialized_analysis)
+                print("Loaded analysis from cache.")
+                self.current_position = 0
+                self.update_display()
+                self.update_critical_moments_list()
+            except json.JSONDecodeError:
+                print(f"Warning: Cache file {cache_file} is corrupted. Recomputing analysis.")
+                os.remove(cache_file)
         cache_file = 'analysis_cache.json'
         if os.path.exists(cache_file):
             try:
