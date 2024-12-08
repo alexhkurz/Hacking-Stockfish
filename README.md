@@ -12,4 +12,4 @@ Then run `python analyze.py` in the `AnalyzeGame` directory.
 
 ## Features Added to `gui.py`
 
-- move in the game using cursor keys
+- Play through the history using right and left arrow keys.
