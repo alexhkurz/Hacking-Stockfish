@@ -74,7 +74,8 @@ class ChessAnalyzerGUI(QMainWindow):
         input_layout.addWidget(analyze_button)
         
         layout.addLayout(input_layout)
-    
+        self.installEventFilter(self)
+        
     def analyze_pgn(self, pgn_string):
         self.analysis, self.critical_moments = self.analyzer.analyzeGame(pgn_string)
         self.current_position = 0
@@ -129,6 +130,16 @@ class ChessAnalyzerGUI(QMainWindow):
         if self.analysis and self.current_position > 0:
             self.current_position -= 1
             self.update_display()
+
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.KeyPress:
+            if event.key() == Qt.Key_Right:
+                self.next_move()
+                return True
+            elif event.key() == Qt.Key_Left:
+                self.prev_move()
+                return True
+        return super().eventFilter(obj, event)
 
 def main():
     app = QApplication(sys.argv)
