@@ -4,6 +4,8 @@ import chess.svg
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QScrollArea, QTextEdit, QListWidget, QListWidgetItem
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtCore import Qt, QSize, QEvent
+import os
+import json
 from analyze import ChessAnalyzer 
 import io
 
