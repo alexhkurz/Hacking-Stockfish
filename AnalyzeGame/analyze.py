@@ -23,7 +23,10 @@ class ChessAnalyzer:
             return
 
         move_number = (current_index // 2) + 1  
-        print(f"FORCED MOVE: {move_number} {current_index + 1} {board.san(move)}")
+        if move is not None:
+            print(f"FORCED MOVE: {move_number} {current_index + 1} {board.san(move)}")
+        else:
+            print(f"FORCED MOVE: {move_number} {current_index + 1} (none)")
 
         current_color = "White" if current_index % 2 == 0 else "Black"
         current_analysis = analysis[current_index]
