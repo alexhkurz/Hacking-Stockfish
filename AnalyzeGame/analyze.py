@@ -9,7 +9,7 @@ import sys
 
 
 class ChessAnalyzer:
-    def __init__(self, engine_path="/Users/kevinhuang/Documents/Projects/Hacking-Stockfish/Stockfish/src/stockfish"):
+    def __init__(self, engine_path="/Users/akurz/alexhkurz-at-git/chess/Stockfish/src/stockfish"):
         self.engine = chess.engine.SimpleEngine.popen_uci(engine_path)
         self.critical_moments = []
 
