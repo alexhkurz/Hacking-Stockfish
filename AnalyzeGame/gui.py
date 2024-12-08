@@ -107,10 +107,9 @@ class ChessAnalyzerGUI(QMainWindow):
                 print(f"Warning: Cache file {cache_file} is corrupted. Recomputing analysis.")
                 os.remove(cache_file)
         else:
-        
-        self.current_position = 0
-        self.update_display()
-        self.update_critical_moments_list()
+            self.current_position = 0
+            self.update_display()
+            self.update_critical_moments_list()
     
     def update_display(self):
         if not self.analysis:
