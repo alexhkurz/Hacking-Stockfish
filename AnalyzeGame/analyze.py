@@ -68,8 +68,9 @@ class ChessAnalyzer:
         board = game.board()
         move_count = 0
 
-        for move in game.mainline_moves():
-            info = self.engine.analyse(board, chess.engine.Limit(time=time_per_move), multipv=5)
+        for move in list(game.mainline_moves()) + [None]:
+            if move is not None:
+                info = self.engine.analyse(board, chess.engine.Limit(time=time_per_move), multipv=5)
 
             print(board.san(move), move_count)
 
@@ -101,7 +102,8 @@ class ChessAnalyzer:
 
 
             #Move the board to the next move state 
-            board.push(move)
+            if move is not None:
+                board.push(move)
             move_count += 1
         
         with open(cache_file, 'w') as file:
