@@ -54,7 +54,8 @@ class ChessAnalyzer:
     def analyzeGame(self, pgn_string, time_per_move=1.0, cache_file='analysis_cache.json'):
         if os.path.exists(cache_file):
             with open(cache_file, 'r') as file:
-                self.analysis, self.critical_moments = json.load(file)
+                serialized_analysis, self.critical_moments = json.load(file)
+                self.analysis = self.deserialize_analysis(serialized_analysis)
             return self.analysis, self.critical_moments
         game = chess.pgn.read_game(io.StringIO(pgn_string))
         analysis = []
@@ -99,11 +100,39 @@ class ChessAnalyzer:
             move_count += 1
         
         with open(cache_file, 'w') as file:
-            json.dump((analysis, self.critical_moments), file)
+            json.dump((self.serialize_analysis(analysis), self.critical_moments), file)
 
         return analysis, self.critical_moments
     
-    def close(self):
+    def serialize_analysis(self, analysis):
+        serialized = []
+        for entry in analysis:
+            serialized_entry = entry.copy()
+            serialized_entry['top_sequences'] = [
+                (score, [move.uci() for move in sequence])
+                for score, sequence in entry['top_sequences']
+            ]
+            serialized_entry['forcing_moves'] = (
+                [move.uci() for move in entry['forcing_moves'][0]],
+                entry['forcing_moves'][1]
+            )
+            serialized.append(serialized_entry)
+        return serialized
+
+    def deserialize_analysis(self, serialized_analysis):
+        analysis = []
+        for entry in serialized_analysis:
+            deserialized_entry = entry.copy()
+            deserialized_entry['top_sequences'] = [
+                (score, [chess.Move.from_uci(move) for move in sequence])
+                for score, sequence in entry['top_sequences']
+            ]
+            deserialized_entry['forcing_moves'] = (
+                [chess.Move.from_uci(move) for move in entry['forcing_moves'][0]],
+                entry['forcing_moves'][1]
+            )
+            analysis.append(deserialized_entry)
+        return analysis
         self.engine.quit()
 
 
