@@ -101,6 +101,9 @@ class ChessAnalyzerGUI(QMainWindow):
         if not self.analysis:
             return
         
+        if self.current_position >= len(self.analysis):
+            self.current_position = len(self.analysis) - 1
+
         pos = self.analysis[self.current_position]
         
         board = chess.Board(pos['fen'])
