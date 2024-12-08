@@ -10,7 +10,7 @@ import json
 
 
 class ChessAnalyzer:
-    def __init__(self, engine_path="/Users/akurz/alexhkurz-at-git/chess/Stockfish/src/stockfish"):
+    def __init__(self):
         with open('config.json', 'r') as config_file:
             config = json.load(config_file)
         self.engine = chess.engine.SimpleEngine.popen_uci(config['engine_path'])
