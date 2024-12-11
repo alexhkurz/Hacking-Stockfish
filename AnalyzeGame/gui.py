@@ -193,7 +193,7 @@ class ChessAnalyzerGUI(QMainWindow):
         filename, _ = QFileDialog.getSaveFileName(
             self, 
             "Save Analysis",
-            "",
+            "AnalyzedGames",
             "JSON Files (*.json)"
         )
         if filename:
@@ -204,7 +204,7 @@ class ChessAnalyzerGUI(QMainWindow):
         filename, _ = QFileDialog.getOpenFileName(
             self,
             "Load Analysis",
-            "",
+            "AnalyzedGames",
             "JSON Files (*.json)"
         )
         if filename:
