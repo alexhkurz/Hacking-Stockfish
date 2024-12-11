@@ -1,7 +1,7 @@
 import sys
 import chess
 import chess.svg
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QScrollArea, QTextEdit, QListWidget, QListWidgetItem
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QScrollArea, QTextEdit, QListWidget, QListWidgetItem, QFileDialog
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtCore import Qt, QSize, QEvent
 import os
@@ -69,6 +69,18 @@ class ChessAnalyzerGUI(QMainWindow):
         right_layout.addWidget(QLabel('Critical Moments:'))
         right_layout.addWidget(self.critical_moments_list)
         
+        # Add save/load buttons
+        file_layout = QHBoxLayout()
+        save_button = QPushButton('Save Analysis')
+        load_button = QPushButton('Load Analysis')
+        save_button.clicked.connect(self.save_analysis)
+        load_button.clicked.connect(self.load_analysis)
+        file_layout.addWidget(save_button)
+        file_layout.addWidget(load_button)
+        
+        # Add this layout to your existing layout structure
+        right_layout.addLayout(file_layout)  # Add to right panel
+        
         layout.addWidget(right_panel)
         
         pgn_input = QTextEdit()
@@ -126,7 +138,6 @@ class ChessAnalyzerGUI(QMainWindow):
             if 'b_score' in pos and pos['b_score'] is not None:
                 analysis_text += f"B-score: {pos['b_score']:.2f}\n"
         
-        analysis_text += "\n"
         analysis_text += "Top Sequences:\n"
         for score, sequence in pos['top_sequences']:
             analysis_text += f"Score: {score}\n"
@@ -174,6 +185,38 @@ class ChessAnalyzerGUI(QMainWindow):
                 self.prev_move()
                 return True
         return super().eventFilter(obj, event)
+    
+    def save_analysis(self):
+        if not self.analysis:
+            return
+            
+        filename, _ = QFileDialog.getSaveFileName(
+            self, 
+            "Save Analysis",
+            "",
+            "JSON Files (*.json)"
+        )
+        if filename:
+            with open(filename, 'w') as file:
+                json.dump((self.analyzer.serialize_analysis(self.analysis), self.critical_moments), file)
+            
+    def load_analysis(self):
+        filename, _ = QFileDialog.getOpenFileName(
+            self,
+            "Load Analysis",
+            "",
+            "JSON Files (*.json)"
+        )
+        if filename:
+            try:
+                with open(filename, 'r') as file:
+                    serialized_analysis, self.critical_moments = json.load(file)
+                    self.analysis = self.analyzer.deserialize_analysis(serialized_analysis)
+                self.current_position = 0
+                self.update_display()
+                self.update_critical_moments_list()
+            except json.JSONDecodeError:
+                print(f"Error: File {filename} is corrupted.")
 
 def main():
     app = QApplication(sys.argv)
