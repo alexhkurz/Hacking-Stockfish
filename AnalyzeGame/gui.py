@@ -1,7 +1,7 @@
 import sys
 import chess
 import chess.svg
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QScrollArea, QTextEdit, QListWidget, QListWidgetItem, QFileDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QScrollArea, QTextEdit, QListWidget, QListWidgetItem, QFileDialog, QSizePolicy
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtCore import Qt, QSize, QEvent
 import os
@@ -91,9 +91,13 @@ class ChessAnalyzerGUI(QMainWindow):
         # Right-most Panel: PGN Input
         pgn_input = QTextEdit()
         pgn_input.setPlaceholderText("Enter PGN here...")
+        pgn_input.setMaximumWidth(100)  # Set maximum width for the input
+
         analyze_button = QPushButton('Analyze')
         analyze_button.clicked.connect(lambda: self.analyze_pgn(pgn_input.toPlainText()))
-        
+        analyze_button.setFixedWidth(100)  # Set fixed width for the button
+        analyze_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)  # Prevent horizontal expansion
+
         input_layout = QVBoxLayout()
         input_layout.addWidget(pgn_input)
         input_layout.addWidget(analyze_button)
@@ -204,6 +208,17 @@ class ChessAnalyzerGUI(QMainWindow):
             elif event.key() == Qt.Key_Left:
                 print("Left arrow pressed")  # Debug print
                 self.prev_move()
+                return True
+            elif event.key() == Qt.Key_Up:
+                print("Up arrow pressed")  # Debug print
+                self.current_position = 0  # Go to start
+                self.update_display()
+                return True
+            elif event.key() == Qt.Key_Down:
+                print("Down arrow pressed")  # Debug print
+                if self.analysis:
+                    self.current_position = len(self.analysis) - 1  # Go to end
+                    self.update_display()
                 return True
         return super().eventFilter(obj, event)
     
