@@ -25,3 +25,4 @@ venv
 config.json
 *.bu*
 local
+analysis_cache.json

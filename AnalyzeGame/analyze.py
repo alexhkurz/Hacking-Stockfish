@@ -95,12 +95,34 @@ class ChessAnalyzer:
                     score = info[i]["score"].white().score(mate_score=10000)
                     top_sequences.append((score, sequence))
 
+                # Calculate A-score
+                best_score = top_sequences[0][0]
+                fifth_score = top_sequences[4][0] if len(top_sequences) >= 5 else best_score
+                a_score = abs((best_score - fifth_score) / best_score) if best_score != 0 else 0
+
+                # Calculate B-score
+                b_score = None
+                current_index = move_count
+                if len(analysis) > 1:  # Need at least 2 moves for comparison
+                    if current_index % 2 == 0:  # White's move
+                        if current_index >= 2 and 'a_score' in analysis[-2]:
+                            prev_a_score = analysis[-2]['a_score']
+                            if prev_a_score != 0:
+                                b_score = (a_score - prev_a_score) / prev_a_score
+                    else:  # Black's move
+                        if current_index >= 2 and 'a_score' in analysis[-2]:
+                            prev_a_score = analysis[-2]['a_score']
+                            if prev_a_score != 0:
+                                b_score = (a_score - prev_a_score) / prev_a_score
+
                 # Append the analysis for the current move
                 analysis.append({
                     'move': (board.san(move), move_count),
                     'fen': board.fen(),
                     'top_sequences': top_sequences,
-                    'forcing_moves': (forcing_moves, move_count)
+                    'forcing_moves': (forcing_moves, move_count),
+                    'a_score': a_score,
+                    'b_score': b_score
                 })
 
                 # Move the board to the next move state

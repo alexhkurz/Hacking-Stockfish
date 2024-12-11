@@ -120,7 +120,14 @@ class ChessAnalyzerGUI(QMainWindow):
         color = "White" if move_count % 2 == 0 else "Black"
         self.move_label.setText(f"Move {move_number} ({color}): {move}")
         
-        analysis_text = "Top Sequences:\n"
+        analysis_text = ""
+        if 'a_score' in pos:
+            analysis_text = f"A-score: {pos['a_score']:.2f}\n"
+            if 'b_score' in pos and pos['b_score'] is not None:
+                analysis_text += f"B-score: {pos['b_score']:.2f}\n"
+        
+        analysis_text += "\n"
+        analysis_text += "Top Sequences:\n"
         for score, sequence in pos['top_sequences']:
             analysis_text += f"Score: {score}\n"
             analysis_text += " ".join(map(str, sequence))
