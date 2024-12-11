@@ -9,7 +9,6 @@ import json
 #FIX ISSUE: IT SHOWS ITSELF AS A FORCING MOVE THAT IT LED TO
 #   - because it's not counting correctly, it's one ahead behind (it thinks 15 is 14)
 
-
 class ChessAnalyzer:
     def __init__(self):
         config_path = os.path.join(os.path.dirname(__file__), 'config.json')
