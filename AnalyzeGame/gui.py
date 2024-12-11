@@ -81,7 +81,13 @@ class ChessAnalyzerGUI(QMainWindow):
         input_layout.addWidget(analyze_button)
         
         layout.addLayout(input_layout)
-        
+
+    def analyze_pgn(self, pgn_string):
+        self.analysis, self.critical_moments = self.analyzer.analyzeGame(pgn_string)
+        self.current_position = 0
+        self.update_display()
+        self.update_critical_moments_list()
+
     def load_cached_analysis(self):
         cache_file = 'analysis_cache.json'
         if os.path.exists(cache_file):
