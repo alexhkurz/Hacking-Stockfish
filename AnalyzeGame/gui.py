@@ -95,10 +95,23 @@ class ChessAnalyzerGUI(QMainWindow):
         layout.addLayout(input_layout)
 
     def analyze_pgn(self, pgn_string):
-        self.analysis, self.critical_moments = self.analyzer.analyzeGame(pgn_string)
-        self.current_position = 0
-        self.update_display()
-        self.update_critical_moments_list()
+        print("Starting analysis...")  # Debug print
+        if not pgn_string.strip():  # Check if input is empty
+            print("No PGN provided")
+            return
+        print(f"Analyzing PGN: {pgn_string}")  # Debug print
+        try:
+            # Delete cache file if it exists
+            if os.path.exists('analysis_cache.json'):
+                os.remove('analysis_cache.json')
+                
+            self.analysis, self.critical_moments = self.analyzer.analyzeGame(pgn_string)
+            print(f"Analysis complete. Moves analyzed: {len(self.analysis) if self.analysis else 0}")  # Debug print
+            self.current_position = 0
+            self.update_display()
+            self.update_critical_moments_list()
+        except Exception as e:
+            print(f"Error during analysis: {str(e)}")  # Debug print for errors
 
     def load_cached_analysis(self):
         cache_file = 'analysis_cache.json'
@@ -137,6 +150,8 @@ class ChessAnalyzerGUI(QMainWindow):
             analysis_text = f"A-score: {pos['a_score']:.2f}\n"
             if 'b_score' in pos and pos['b_score'] is not None:
                 analysis_text += f"B-score: {pos['b_score']:.2f}\n"
+        
+        analysis_text += "\n"
         
         analysis_text += "Top Sequences:\n"
         for score, sequence in pos['top_sequences']:
