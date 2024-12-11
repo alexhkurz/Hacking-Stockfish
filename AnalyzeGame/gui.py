@@ -93,6 +93,9 @@ class ChessAnalyzerGUI(QMainWindow):
         pgn_input.setPlaceholderText("Enter PGN here...")
         pgn_input.setMaximumWidth(100)  # Set maximum width for the input
 
+        load_pgn_button = QPushButton('Load PGN')
+        load_pgn_button.clicked.connect(lambda: self.load_pgn(pgn_input))
+
         analyze_button = QPushButton('Analyze')
         analyze_button.clicked.connect(lambda: self.analyze_pgn(pgn_input.toPlainText()))
         analyze_button.setFixedWidth(100)  # Set fixed width for the button
@@ -100,6 +103,7 @@ class ChessAnalyzerGUI(QMainWindow):
 
         input_layout = QVBoxLayout()
         input_layout.addWidget(pgn_input)
+        input_layout.addWidget(load_pgn_button)  # Add Load PGN button
         input_layout.addWidget(analyze_button)
         
         layout.addLayout(input_layout)
@@ -229,7 +233,7 @@ class ChessAnalyzerGUI(QMainWindow):
         filename, _ = QFileDialog.getSaveFileName(
             self, 
             "Save Analysis",
-            "AnalyzedGames",
+            "GamesAnalyzed",
             "JSON Files (*.json)"
         )
         if filename:
@@ -240,7 +244,7 @@ class ChessAnalyzerGUI(QMainWindow):
         filename, _ = QFileDialog.getOpenFileName(
             self,
             "Load Analysis",
-            "AnalyzedGames",
+            "GamesAnalyzed",
             "JSON Files (*.json)"
         )
         if filename:
@@ -253,6 +257,19 @@ class ChessAnalyzerGUI(QMainWindow):
                 self.update_critical_moments_list()
             except json.JSONDecodeError:
                 print(f"Error: File {filename} is corrupted.")
+
+    def load_pgn(self, pgn_input):
+        filename, _ = QFileDialog.getOpenFileName(
+            self,
+            "Load PGN",
+            "",
+            "PGN Files (*.pgn);;All Files (*)"
+        )
+        if filename:
+            with open(filename, 'r') as file:
+                pgn_data = file.read()
+                pgn_input.setPlainText(pgn_data)
+                self.analyze_pgn(pgn_data)  # Automatically analyze after loading
 
 def main():
     app = QApplication(sys.argv)
