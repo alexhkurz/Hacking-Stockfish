@@ -93,13 +93,13 @@ class ChessAnalyzerGUI(QMainWindow):
         pgn_input.setPlaceholderText("Enter PGN here...")
         pgn_input.setMaximumWidth(100)  # Set maximum width for the input
 
-        load_pgn_button = QPushButton('Load PGN')
-        load_pgn_button.clicked.connect(lambda: self.load_pgn(pgn_input))
-
         analyze_button = QPushButton('Analyze')
         analyze_button.clicked.connect(lambda: self.analyze_pgn(pgn_input.toPlainText()))
         analyze_button.setFixedWidth(100)  # Set fixed width for the button
         analyze_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)  # Prevent horizontal expansion
+
+        load_pgn_button = QPushButton('Load PGN')
+        load_pgn_button.clicked.connect(lambda: self.load_pgn(pgn_input))
 
         input_layout = QVBoxLayout()
         input_layout.addWidget(pgn_input)
