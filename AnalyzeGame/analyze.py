@@ -92,7 +92,7 @@ class ChessAnalyzer:
                 top_sequences = []
                 for i in range(min(5, len(info))):
                     sequence = info[i]["pv"]
-                    score = info[i]["score"].score(mate_score=10000)
+                    score = info[i]["score"].white().score(mate_score=10000)
                     top_sequences.append((score, sequence))
 
                 # Append the analysis for the current move
