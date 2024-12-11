@@ -31,16 +31,19 @@ class ChessAnalyzerGUI(QMainWindow):
         self.setWindowTitle('Chess Game Analyzer')
         self.setMinimumSize(1000, 600)
         
+        # Create main central widget and layout
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         layout = QHBoxLayout(central_widget)
         
+        # Left Panel: Chess Board and Navigation
         left_panel = QWidget()
         left_layout = QVBoxLayout(left_panel)
+        # Chess board display
         self.board_widget = QSvgWidget()
         self.board_widget.setFixedSize(400, 400)
         left_layout.addWidget(self.board_widget)
-        
+        # Previous/Next move buttons
         nav_layout = QHBoxLayout()
         self.prev_button = QPushButton('Previous')
         self.next_button = QPushButton('Next')
@@ -52,10 +55,14 @@ class ChessAnalyzerGUI(QMainWindow):
         
         layout.addWidget(left_panel)
         
+        # Right Panel: Analysis Display
         right_panel = QWidget()
         right_layout = QVBoxLayout(right_panel)
         
+        # Current move display
         self.move_label = QLabel('Move: ')
+        
+        # Analysis text display
         self.analysis_text = QTextEdit()
         self.analysis_text.setReadOnly(True)
         
@@ -63,13 +70,13 @@ class ChessAnalyzerGUI(QMainWindow):
         right_layout.addWidget(QLabel('Top Sequences:'))
         right_layout.addWidget(self.analysis_text)
         
-        # Add Critical Moments List
+        # Critical Moments List
         self.critical_moments_list = QListWidget()
         self.critical_moments_list.itemClicked.connect(self.critical_moment_clicked)
         right_layout.addWidget(QLabel('Critical Moments:'))
         right_layout.addWidget(self.critical_moments_list)
         
-        # Add save/load buttons
+        # Save/Load buttons
         file_layout = QHBoxLayout()
         save_button = QPushButton('Save Analysis')
         load_button = QPushButton('Load Analysis')
@@ -77,12 +84,11 @@ class ChessAnalyzerGUI(QMainWindow):
         load_button.clicked.connect(self.load_analysis)
         file_layout.addWidget(save_button)
         file_layout.addWidget(load_button)
-        
-        # Add this layout to your existing layout structure
-        right_layout.addLayout(file_layout)  # Add to right panel
+        right_layout.addLayout(file_layout)
         
         layout.addWidget(right_panel)
         
+        # Right-most Panel: PGN Input
         pgn_input = QTextEdit()
         pgn_input.setPlaceholderText("Enter PGN here...")
         analyze_button = QPushButton('Analyze')
