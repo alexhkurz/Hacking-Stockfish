@@ -55,9 +55,9 @@ class ChessAnalyzerGUI(QMainWindow):
         
         layout.addWidget(left_panel)
         
-        # Right Panel: Analysis Display
-        right_panel = QWidget()
-        right_layout = QVBoxLayout(right_panel)
+        # Analysis Panel: Analysis Display
+        analysis_panel = QWidget()
+        analysis_layout = QVBoxLayout(analysis_panel)
         
         # Current move display
         self.move_label = QLabel('Move: ')
@@ -66,15 +66,15 @@ class ChessAnalyzerGUI(QMainWindow):
         self.analysis_text = QTextEdit()
         self.analysis_text.setReadOnly(True)
         
-        right_layout.addWidget(self.move_label)
-        right_layout.addWidget(QLabel('Top Sequences:'))
-        right_layout.addWidget(self.analysis_text)
+        analysis_layout.addWidget(self.move_label)
+        analysis_layout.addWidget(QLabel('Top Sequences:'))
+        analysis_layout.addWidget(self.analysis_text)
         
         # Critical Moments List
         self.critical_moments_list = QListWidget()
         self.critical_moments_list.itemClicked.connect(self.critical_moment_clicked)
-        right_layout.addWidget(QLabel('Critical Moments:'))
-        right_layout.addWidget(self.critical_moments_list)
+        analysis_layout.addWidget(QLabel('Critical Moments:'))
+        analysis_layout.addWidget(self.critical_moments_list)
         
         # Save/Load buttons
         file_layout = QHBoxLayout()
@@ -84,9 +84,9 @@ class ChessAnalyzerGUI(QMainWindow):
         load_button.clicked.connect(self.load_analysis)
         file_layout.addWidget(save_button)
         file_layout.addWidget(load_button)
-        right_layout.addLayout(file_layout)
+        analysis_layout.addLayout(file_layout)
         
-        layout.addWidget(right_panel)
+        layout.addWidget(analysis_panel)
         
         # Right-most Panel: PGN Input
         pgn_input = QTextEdit()
