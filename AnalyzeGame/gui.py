@@ -191,10 +191,19 @@ class ChessAnalyzerGUI(QMainWindow):
             if event.inaxes == ax:
                 cont, ind = sc.contains(event)
                 if cont:
-                    index = ind["ind"][0]  # Get the index of the point
-                    annot.xy = (index, scores[index])  # Set annotation position
-                    text = f"{pos['top_sequences'][index][1][0]}"  # Just the move sequence, no "Move:" prefix
-                    annot.set_text(text)
+                    index = ind["ind"][0]
+                    annot.xy = (index, scores[index])
+                    move = pos['top_sequences'][index][1][0]  # Get the move
+                    #print(f"Debug - move: {move}, type: {type(move)}")  # Debug print
+                    
+                    board = chess.Board(pos['fen'])
+                    # If move is already a Move object, don't convert it
+                    if isinstance(move, chess.Move):
+                        san_move = board.san(move)
+                    else:
+                        san_move = board.san(chess.Move.from_uci(move))
+                        
+                    annot.set_text(san_move)
                     annot.set_visible(True)
                     self.canvas.draw_idle()
                 else:
@@ -318,6 +327,11 @@ class ChessAnalyzerGUI(QMainWindow):
                 with open(filename, 'r') as file:
                     serialized_analysis, self.critical_moments = json.load(file)
                     self.analysis = self.analyzer.deserialize_analysis(serialized_analysis)
+                
+                # Save to cache file
+                with open('analysis_cache.json', 'w') as cache_file:
+                    json.dump((serialized_analysis, self.critical_moments), cache_file)
+                
                 self.current_position = 0
                 self.update_display()
                 self.update_critical_moments_list()
