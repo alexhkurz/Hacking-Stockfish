@@ -16,6 +16,7 @@ Then run `python analyze.py` in the `AnalyzeGame` directory.
 - If `analysis_cache.json` exists, load it instead of recreating the analysis.
 - A-score
 - B-score 
+- `self.NUM_TOP_MOVES`, `self.A_SCORE_WINDOW` added
 
 ## Features Added to `gui.py`
 
@@ -23,4 +24,5 @@ Then run `python analyze.py` in the `AnalyzeGame` directory.
 - Jump to the start or end of the game using up and down arrow keys.
 - Save and load analysis to a file.
 - Display the A-score and B-score for each move.
+- shift-right and shift-left move the game forward and backward by 2 moves.
 
