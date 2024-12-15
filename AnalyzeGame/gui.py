@@ -98,14 +98,30 @@ class ChessAnalyzerGUI(QMainWindow):
         analyze_button.setFixedWidth(100)  # Set fixed width for the button
         analyze_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)  # Prevent horizontal expansion
 
-        load_pgn_button = QPushButton('Load PGN')
+        # Load and Analyze PGN from file
+        load_pgn_button = QPushButton()
         load_pgn_button.clicked.connect(lambda: self.load_pgn(pgn_input))
+        load_pgn_button.setFixedWidth(100)  # Set fixed width for the button        
+        load_pgn_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)  # Prevent horizontal expansion
+        # Create a QLabel with word wrap for the button text
+        label = QLabel('Load PGN and Analyze')
+        label.setWordWrap(True)
+        label.setAlignment(Qt.AlignCenter)  # Center the text
+        load_pgn_button.setLayout(QVBoxLayout())
+        load_pgn_button.layout().addWidget(label)
+        # Set the background to white and add rounded corners
+        load_pgn_button.setStyleSheet("""
+            QPushButton { 
+                background-color: white;
+                border-radius: 5px;
+            }
+        """)
 
         input_layout = QVBoxLayout()
         input_layout.addWidget(pgn_input)
-        input_layout.addWidget(load_pgn_button)  # Add Load PGN button
         input_layout.addWidget(analyze_button)
-        
+        input_layout.addWidget(load_pgn_button) 
+
         layout.addLayout(input_layout)
 
     def analyze_pgn(self, pgn_string):
