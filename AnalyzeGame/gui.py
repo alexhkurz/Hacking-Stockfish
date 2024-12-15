@@ -8,6 +8,9 @@ import os
 import json
 from analyze import ChessAnalyzer 
 import io
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+from matplotlib.figure import Figure
+import numpy as np
 
 class ChessAnalyzerGUI(QMainWindow):
     def __init__(self, analyzer):
@@ -39,11 +42,11 @@ class ChessAnalyzerGUI(QMainWindow):
         # Left Panel: Chess Board and Navigation
         left_panel = QWidget()
         left_layout = QVBoxLayout(left_panel)
-        # Chess board display
+        ## Chess board display
         self.board_widget = QSvgWidget()
         self.board_widget.setFixedSize(400, 400)
         left_layout.addWidget(self.board_widget)
-        # Previous/Next move buttons
+        ## Previous/Next move buttons
         nav_layout = QHBoxLayout()
         self.prev_button = QPushButton('Previous')
         self.next_button = QPushButton('Next')
@@ -52,31 +55,33 @@ class ChessAnalyzerGUI(QMainWindow):
         nav_layout.addWidget(self.prev_button)
         nav_layout.addWidget(self.next_button)
         left_layout.addLayout(nav_layout)
-        
+        ## Add left panel to layout
         layout.addWidget(left_panel)
         
-        # Analysis Panel: Analysis Display
+        # Analysis Panel
         analysis_panel = QWidget()
-        analysis_layout = QVBoxLayout(analysis_panel)
-        
-        # Current move display
+        analysis_layout = QVBoxLayout(analysis_panel)  
+        ## Current move display
         self.move_label = QLabel('Move: ')
-        
-        # Analysis text display
+        analysis_layout.addWidget(self.move_label)
+        ## Create matplotlib figure for plotting scores
+        self.figure = Figure(figsize=(5, 2))
+        self.canvas = FigureCanvasQTAgg(self.figure)
+        self.canvas.setMaximumHeight(200)  # Limit height of the plot
+        ## Add plot to analysis layout at the top
+        analysis_layout.addWidget(self.canvas)  
+        ## Analysis text display
         self.analysis_text = QTextEdit()
         self.analysis_text.setReadOnly(True)
-        
-        analysis_layout.addWidget(self.move_label)
+        ## Add top sequences label and text display
         analysis_layout.addWidget(QLabel('Top Sequences:'))
-        analysis_layout.addWidget(self.analysis_text)
-        
-        # Critical Moments List
+        analysis_layout.addWidget(self.analysis_text)        
+        ## Critical Moments List
         self.critical_moments_list = QListWidget()
         self.critical_moments_list.itemClicked.connect(self.critical_moment_clicked)
         analysis_layout.addWidget(QLabel('Critical Moments:'))
-        analysis_layout.addWidget(self.critical_moments_list)
-        
-        # Save/Load buttons
+        analysis_layout.addWidget(self.critical_moments_list)        
+        ## Save/Load buttons
         file_layout = QHBoxLayout()
         save_button = QPushButton('Save Analysis')
         load_button = QPushButton('Load Analysis')
@@ -85,7 +90,7 @@ class ChessAnalyzerGUI(QMainWindow):
         file_layout.addWidget(save_button)
         file_layout.addWidget(load_button)
         analysis_layout.addLayout(file_layout)
-        
+        ## Add analysis panel to layout
         layout.addWidget(analysis_panel)
         
         # Right-most Panel: PGN Input
@@ -159,13 +164,22 @@ class ChessAnalyzerGUI(QMainWindow):
                 os.remove(cache_file)
     
     def update_display(self):
-        if not self.analysis:
+        if not self.analysis or self.current_position >= len(self.analysis):
             return
-        
-        if self.current_position >= len(self.analysis):
-            self.current_position = len(self.analysis) - 1
-
+            
         pos = self.analysis[self.current_position]
+        
+        # Update plot
+        self.figure.clear()
+        ax = self.figure.add_subplot(111)
+        scores = [score for score, _ in pos["top_sequences"]]
+        moves = range(len(scores))
+        ax.plot(moves, scores, 'bo-')  # Blue dots connected by lines
+        # ax.set_xlabel('Move Rank')
+        ax.set_ylabel('Score')
+        ax.grid(True)
+        ax.set_xticklabels([])  # This will remove the x-axis number labels
+        self.canvas.draw()
         
         board = chess.Board(pos['fen'])
         self.board_widget.load(chess.svg.board(board).encode())
