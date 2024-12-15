@@ -178,7 +178,33 @@ class ChessAnalyzerGUI(QMainWindow):
         # ax.set_xlabel('Move Rank')
         ax.set_ylabel('Score')
         ax.grid(True)
-        ax.set_xticklabels([])  # This will remove the x-axis number labels
+        ax.set_xticklabels([])
+
+        # Create annotation that will be shown on hover
+        annot = ax.annotate("", xy=(0,0), xytext=(10,10),
+                           textcoords="offset points",
+                           bbox=dict(boxstyle="round", fc="w"),
+                           arrowprops=dict(arrowstyle="->"))
+        annot.set_visible(False)
+
+        def hover(event):
+            if event.inaxes == ax:
+                cont, ind = sc.contains(event)
+                if cont:
+                    index = ind["ind"][0]  # Get the index of the point
+                    annot.xy = (index, scores[index])  # Set annotation position
+                    text = f"{pos['top_sequences'][index][1][0]}"  # Just the move sequence, no "Move:" prefix
+                    annot.set_text(text)
+                    annot.set_visible(True)
+                    self.canvas.draw_idle()
+                else:
+                    annot.set_visible(False)
+                    self.canvas.draw_idle()
+
+        # Store the scatter plot object and connect the event
+        sc = ax.scatter(moves, scores, color='blue')
+        self.canvas.mpl_connect("motion_notify_event", hover)
+        
         self.canvas.draw()
         
         board = chess.Board(pos['fen'])
