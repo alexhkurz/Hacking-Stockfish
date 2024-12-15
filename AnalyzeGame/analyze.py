@@ -15,7 +15,9 @@ class ChessAnalyzer:
         with open(config_path, 'r') as config_file:
             config = json.load(config_file)
         self.engine = chess.engine.SimpleEngine.popen_uci(config['engine_path'])
+        self.NUM_TOP_MOVES = 20  # Changed to 20
         self.critical_moments = []
+        self.A_SCORE_WINDOW = 5  # not greater than NUM_TOP_MOVES
 
     def findCriticalMoment(self, analysis, current_index, move, board):
         if current_index < 2:  
@@ -50,9 +52,6 @@ class ChessAnalyzer:
                         'description': f"{current_analysis['move'][0]} is a forced move that came from {earlier_good_move} (move {earlier_move_number}), reducing options from {earlier_good_options} to {current_good_options}"
                     })
                     break
-        
-
-        
     
     def analyzeGame(self, pgn_string, time_per_move=1.0, cache_file='analysis_cache.json'):
         if os.path.exists(cache_file):
@@ -72,7 +71,7 @@ class ChessAnalyzer:
 
         for move in list(game.mainline_moves()) + [None]:
             if move is not None:
-                info = self.engine.analyse(board, chess.engine.Limit(time=time_per_move), multipv=5)
+                info = self.engine.analyse(board, chess.engine.Limit(time=time_per_move), multipv=self.NUM_TOP_MOVES)
 
                 print(board.san(move), move_count)
 
@@ -89,7 +88,7 @@ class ChessAnalyzer:
 
                 # Add sequences to analysis for gui
                 top_sequences = []
-                for i in range(min(5, len(info))):
+                for i in range(min(self.NUM_TOP_MOVES, len(info))):
                     sequence = info[i]["pv"]
                     score = info[i]["score"].white().score(mate_score=10000)
                     top_sequences.append((score, sequence))
@@ -97,8 +96,8 @@ class ChessAnalyzer:
 
                 # Calculate A-score
                 best_score = top_sequences[0][0]
-                fifth_score = top_sequences[4][0] if len(top_sequences) >= 5 else best_score
-                a_score = abs(best_score - fifth_score) if best_score != 0 else 0
+                least_score = top_sequences[self.A_SCORE_WINDOW - 1][0] if len(top_sequences) >= self.A_SCORE_WINDOW else best_score # TODO: best_score?
+                a_score = abs(best_score - least_score) if best_score != 0 else 0
 
                 # Calculate B-score
                 b_score = None
