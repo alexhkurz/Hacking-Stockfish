@@ -222,12 +222,22 @@ class ChessAnalyzerGUI(QMainWindow):
         if event.type() == QEvent.KeyPress:
             print(f"Key pressed: {event.key()}")  # Debug print
             if event.key() == Qt.Key_Right:
-                print("Right arrow pressed")  # Debug print
-                self.next_move()
+                if event.modifiers() & Qt.ShiftModifier:  # Check if Shift is pressed
+                    print("Shift+Right arrow pressed")  # Debug print
+                    self.next_move()
+                    self.next_move()
+                else:
+                    print("Right arrow pressed")  # Debug print
+                    self.next_move()
                 return True
             elif event.key() == Qt.Key_Left:
-                print("Left arrow pressed")  # Debug print
-                self.prev_move()
+                if event.modifiers() & Qt.ShiftModifier:  # Check if Shift is pressed
+                    print("Shift+Left arrow pressed")  # Debug print
+                    self.prev_move()
+                    self.prev_move()
+                else:
+                    print("Left arrow pressed")  # Debug print
+                    self.prev_move()
                 return True
             elif event.key() == Qt.Key_Up:
                 print("Up arrow pressed")  # Debug print
