@@ -8,7 +8,7 @@ Create a file `AnalyzeGame/config.json` containing the path to the Stockfish exe
 }
 ```
 
-Then run `python analyze.py` in the `AnalyzeGame` directory.
+Then run `python gui.py` in the `AnalyzeGame` directory.
 
 ## Features Added to `analyze.py`
 
@@ -25,4 +25,5 @@ Then run `python analyze.py` in the `AnalyzeGame` directory.
 - Save and load analysis to a file.
 - Display the A-score and B-score for each move.
 - shift-right and shift-left move the game forward and backward by 2 moves.
+- Best 20 moves with their scores are plotted. 
 

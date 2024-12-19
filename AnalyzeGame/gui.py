@@ -168,19 +168,37 @@ class ChessAnalyzerGUI(QMainWindow):
             return
             
         pos = self.analysis[self.current_position]
-        
+        board = chess.Board(pos['fen'])
+
+        # Update move label
+        move, move_count = pos['move']
+        move_number = (move_count // 2) + 1  # Calculate the move number
+        color = "White" if move_count % 2 == 0 else "Black"
+        self.move_label.setText(f"Move {move_number} ({color}): {move}")
+
         # Update plot
         self.figure.clear()
         ax = self.figure.add_subplot(111)
         scores = [score for score, _ in pos["top_sequences"]]
         moves = range(len(scores))
+        
+        # Plot all moves in blue
         ax.plot(moves, scores, 'bo-')  # Blue dots connected by lines
-        # ax.set_xlabel('Move Rank')
+        
+        # Highlight actual move in red if it exists and is within bounds
+        for i, (score, sequence) in enumerate(pos["top_sequences"]):
+            if sequence:
+                sequence_move = sequence[0]  # Convert LAN to Move object
+                sequence_move_san = board.san(sequence_move)      # Convert to SAN
+                if sequence_move_san == move:                     # Compare both in SAN
+                    ax.plot(i, scores[i], 'ro')
+                    break
+
         ax.set_ylabel('Score')
         ax.grid(True)
         ax.set_xticklabels([])
 
-        # Create annotation that will be shown on hover
+        ## Create annotation that will be shown on hover
         annot = ax.annotate("", xy=(0,0), xytext=(10,10),
                            textcoords="offset points",
                            bbox=dict(boxstyle="round", fc="w"),
@@ -210,20 +228,17 @@ class ChessAnalyzerGUI(QMainWindow):
                     annot.set_visible(False)
                     self.canvas.draw_idle()
 
-        # Store the scatter plot object and connect the event
+        ## Store the scatter plot object and connect the event
         sc = ax.scatter(moves, scores, color='blue')
         self.canvas.mpl_connect("motion_notify_event", hover)
         
         self.canvas.draw()
         
+        # Update board display
         board = chess.Board(pos['fen'])
         self.board_widget.load(chess.svg.board(board).encode())
-        
-        move, move_count = pos['move']
-        move_number = (move_count // 2) + 1  # Calculate the move number
-        color = "White" if move_count % 2 == 0 else "Black"
-        self.move_label.setText(f"Move {move_number} ({color}): {move}")
-        
+                
+        # Update analysis text
         analysis_text = ""
         if 'a_score' in pos:
             analysis_text = f"A-score: {pos['a_score']:.2f}\n"
